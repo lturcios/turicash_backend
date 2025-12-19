@@ -30,6 +30,22 @@ router.get('/', async (req, res) => {
   }
 });
 
+// --- GET /api/items/active (Solo items activos) ---
+router.get('/active', async (req, res) => {
+  // Este endpoint es para la app móvil, que solo necesita items activos.
+  // Filtramos por location_id del token (middleware ya lo agregó a req.user).
+  const locationId = req.user.locationId;
+  const query = 'SELECT i.*, l.name as location_name FROM items i LEFT JOIN locations l ON i.location_id = l.id WHERE i.is_active = 1 AND i.location_id = ? ORDER BY i.name ASC';
+
+  try {
+    const [results] = await dbPool.query(query, [locationId]);
+    res.json(results);
+  } catch (err) {
+    console.error('Error al obtener items activos:', err);
+    return res.status(500).json({ error: 'Error en la base de datos' });
+  }
+});
+
 // --- POST /api/items (Crear nuevo item) ---
 router.post('/', async (req, res) => {
   const { name, price, location_id, icon_base64 } = req.body;

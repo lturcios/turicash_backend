@@ -36,6 +36,7 @@ router.post('/register', async (req, res) => {
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {
+    console.log('Datos recibidos en login:', req.body);
     const { username, pin } = req.body;
 
     if (!username || !pin) {
