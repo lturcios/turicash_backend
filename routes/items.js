@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
   // (Mejora: Si el token del panel web no tiene locationId, es un admin)
   // Por simplicidad, devolvemos todo.
   
-  const query = 'SELECT i.*, l.name as location_name FROM items i LEFT JOIN locations l ON i.location_id = l.id ORDER BY i.name ASC';
+  const query = 'SELECT i.id, i.name, i.base_price, i.base_quantity, i.location_id, i.icon_base64, i.is_active, l.name as location_name FROM items i LEFT JOIN locations l ON i.location_id = l.id ORDER BY i.name ASC';
 
   try {
     const [results] = await dbPool.query(query);
@@ -32,13 +32,10 @@ router.get('/', async (req, res) => {
 
 // --- GET /api/items/active (Solo items activos) ---
 router.get('/active', async (req, res) => {
-  // Este endpoint es para la app móvil, que solo necesita items activos.
-  // Filtramos por location_id del token (middleware ya lo agregó a req.user).
-  const locationId = req.user.locationId;
-  const query = 'SELECT i.*, l.name as location_name FROM items i LEFT JOIN locations l ON i.location_id = l.id WHERE i.is_active = 1 AND i.location_id = ? ORDER BY i.name ASC';
+  const query = 'SELECT i.id, i.name, i.base_price, i.base_quantity, i.location_id, i.icon_base64, i.is_active, l.name as location_name FROM items i LEFT JOIN locations l ON i.location_id = l.id WHERE i.is_active = 1 ORDER BY i.name ASC';
 
   try {
-    const [results] = await dbPool.query(query, [locationId]);
+    const [results] = await dbPool.query(query);
     res.json(results);
   } catch (err) {
     console.error('Error al obtener items activos:', err);
@@ -48,19 +45,19 @@ router.get('/active', async (req, res) => {
 
 // --- POST /api/items (Crear nuevo item) ---
 router.post('/', async (req, res) => {
-  const { name, price, location_id, icon_base64 } = req.body;
+  const { name, base_price, base_quantity, location_id, icon_base64 } = req.body;
 
-  if (!name || !price || !location_id) {
-    return res.status(400).json({ error: 'Nombre, precio y ubicación son requeridos.' });
+  if (!name || !base_price || !location_id || !base_quantity) {
+    return res.status(400).json({ error: 'Nombre, precio base, cantidad base y ubicación son requeridos.' });
   }
 
   const query = `
-    INSERT INTO items (name, price, location_id, icon_base64, is_active)
-    VALUES (?, ?, ?, ?, true)
+    INSERT INTO items (name, base_price, base_quantity, location_id, icon_base64, is_active)
+    VALUES (?, ?, ?, ?, ?, true)
   `;
   
   try {
-    const [result] = await dbPool.execute(query, [name, price, location_id, icon_base64 || null]);
+    const [result] = await dbPool.execute(query, [name, base_price, base_quantity, location_id, icon_base64 || null]);
     res.status(201).json({ message: 'Item creado', id: result.insertId });
   } catch (err) {
     console.error('Error al crear item:', err);
@@ -71,10 +68,10 @@ router.post('/', async (req, res) => {
 // --- PUT /api/items/:id (Actualizar item) ---
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const { name, price, location_id, icon_base64, is_active } = req.body;
+  const { name, base_price, base_quantity, location_id, icon_base64, is_active } = req.body;
 
-  if (!name || !price || !location_id) {
-    return res.status(400).json({ error: 'Nombre, precio y ubicación son requeridos.' });
+  if (!name || !base_price || !location_id || !base_quantity) {
+    return res.status(400).json({ error: 'Nombre, precio base, cantidad base y ubicación son requeridos.' });
   }
 
   // Si no se envía un nuevo ícono (icon_base64 es null o undefined), 
@@ -87,24 +84,25 @@ router.put('/:id', async (req, res) => {
     // Actualizar con nuevo ícono
     query = `
       UPDATE items 
-      SET name = ?, price = ?, location_id = ?, icon_base64 = ?, is_active = ?
+      SET name = ?, base_price = ?, base_quantity = ?, location_id = ?, icon_base64 = ?, is_active = ?
       WHERE id = ?
     `;
-    params = [name, price, location_id, icon_base64, is_active, id];
+    params = [name, base_price, base_quantity, location_id, icon_base64, is_active, id];
   } else {
     // Actualizar SIN cambiar el ícono
     query = `
       UPDATE items 
-      SET name = ?, price = ?, location_id = ?, is_active = ?
+      SET name = ?, base_price = ?, base_quantity = ?, location_id = ?, is_active = ?
       WHERE id = ?
     `;
-    params = [name, price, location_id, is_active, id];
+    params = [name, base_price, base_quantity, location_id, is_active, id];
   }
 
-  try {
+    try {
     const [result] = await dbPool.execute(query, params);
+
     if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Item no encontrado.' });
+      return res.status(404).json({ error: 'Item no encontrado para actualizar.' });
     }
     res.json({ message: 'Item actualizado' });
   } catch (err) {

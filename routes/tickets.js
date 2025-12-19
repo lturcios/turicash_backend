@@ -58,7 +58,7 @@ router.post('/sync', async (req, res) => {
       if (ticketDto.items && ticketDto.items.length > 0) {
         const itemsQuery = `
           INSERT INTO ticket_items 
-          (ticket_id, item_id, quantity, unit_price, item_name)
+          (ticket_id, item_id, quantity, unit_price, item_name, applied_base_price, applied_base_quantity)
           VALUES ? 
         `; // Inserción múltiple
 
@@ -67,7 +67,9 @@ router.post('/sync', async (req, res) => {
           item.itemId,
           item.quantity,
           item.unitPrice,
-          item.itemName
+          item.itemName,
+          item.basePrice || 0,     // Nuevo campo: precio base al momento de venta
+          item.baseQuantity || 0   // Nuevo campo: cantidad base al momento de venta
         ]);
 
         await connection.query(itemsQuery, [itemsData]);
