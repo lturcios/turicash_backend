@@ -5,6 +5,7 @@ require('dotenv').config(); // Para variables de entorno (.env)
 const db = require('../config/db'); // Configuración de la base de datos, ahora es pool de conexiones
 const authRoutes = require('../routes/auth');
 const itemsRoutes = require('../routes/items');
+const categoriesRoutes = require('../routes/categories');
 const locationsRoutes = require('../routes/locations');
 const ticketsRoutes = require('../routes/tickets');
 const usersRoutes = require('../routes/users');
@@ -38,6 +39,7 @@ app.use('/api/auth', authRoutes);
 
 // Otras rutas
 app.use('/api/locations', locationsRoutes);
+app.use('/api/categories', categoriesRoutes);
 app.use('/api/items', itemsRoutes);
 app.use('/api/tickets', ticketsRoutes);
 app.use('/api/users', usersRoutes);
