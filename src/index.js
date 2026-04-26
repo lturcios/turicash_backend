@@ -15,16 +15,16 @@ const app = express();
 
 // --- Conectar a la Base de Datos ---
 db.getConnection
-  .then((connection) => {
+  .then(connection => {
     console.log('Conexión a la base de datos establecida.');
     connection.release(); // Liberar la conexión después de probarla
   })
-  .catch((err) => {
+  .catch(err => {
     console.error('Error al conectar a la base de datos:', err);
     process.exit(1); // Salir si no se puede conectar a la base de datos
   });
 
-  
+
 // --- Middlewares ---
 app.use(cors()); // Habilitar CORS para todas las rutas
 app.use(express.json({ limit: '10mb' })); // Middleware para parsear JSON (aumentamos limite para iconos)
