@@ -14,16 +14,17 @@ const dashboardRoutes = require('../routes/dashboard');
 const app = express();
 
 // --- Conectar a la Base de Datos ---
-db.getConnection((err, connection) => {
-  if (err) {
-    console.error('Error al conectar a la base de datos:', err);
-    process.exit(1); // Salir del proceso si no se puede conectar
-  } else {
+db.getConnection
+  .then((connection) => {
     console.log('Conexión a la base de datos establecida.');
-    connection.release(); // Liberar la conexión de vuelta al pool
-  }
-});
+    connection.release(); // Liberar la conexión después de probarla
+  })
+  .catch((err) => {
+    console.error('Error al conectar a la base de datos:', err);
+    process.exit(1); // Salir si no se puede conectar a la base de datos
+  });
 
+  
 // --- Middlewares ---
 app.use(cors()); // Habilitar CORS para todas las rutas
 app.use(express.json({ limit: '10mb' })); // Middleware para parsear JSON (aumentamos limite para iconos)
