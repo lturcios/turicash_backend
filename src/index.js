@@ -14,6 +14,7 @@ const dashboardRoutes = require('../routes/dashboard');
 const app = express();
 
 // --- Conectar a la Base de Datos ---
+/*
 db.getConnection
   .then(connection => {
     console.log('Conexión a la base de datos establecida.');
@@ -23,6 +24,19 @@ db.getConnection
     console.error('Error al conectar a la base de datos:', err);
     process.exit(1); // Salir si no se puede conectar a la base de datos
   });
+*/
+
+async function testConnection() {
+  try {
+    const conn = await db.getConnection();
+    console.log('Conexión a la base de datos establecida desde index.');
+    conn.release();
+  } catch (err) {
+      console.error('Error al conectar a la base de datos:', err.message);
+    }
+}
+
+testConnection();
 
 
 // --- Middlewares ---
