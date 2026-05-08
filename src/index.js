@@ -39,9 +39,9 @@ async function testConnection() {
 testConnection();
 
 const allowedOrigins = [
-       'https://admin.facturacionsv.app',  // Tu nuevo panel web (Producción)
-       'http://localhost:5173',           // Vite local (Desarrollo)
-       'http://localhost:3000'            // Por las dudas, si probás local
+       'https://interno.metrocuadrado.com.sv',  
+       'http://localhost:5173',
+       'http://localhost:3000'
     ];
 
 // --- Middlewares ---
