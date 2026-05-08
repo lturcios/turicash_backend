@@ -38,9 +38,28 @@ async function testConnection() {
 
 testConnection();
 
+const allowedOrigins = [
+       'https://admin.facturacionsv.app',  // Tu nuevo panel web (Producción)
+       'http://localhost:5173',           // Vite local (Desarrollo)
+       'http://localhost:3000'            // Por las dudas, si probás local
+    ];
 
 // --- Middlewares ---
-app.use(cors()); // Habilitar CORS para todas las rutas
+app.use(cors({
+  origin: function (origin, callback) {
+    // permitimos peticiones sin origen (como aplicaciones móviles o curl)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('No permitido por CORS'));
+      }
+    },
+   methods: ['GET', 'POST', 'PUT', 'DELETE'],
+   credentials: true // Habilitalo si usás Cookies o Sessions
+}));
+
 app.use(express.json({ limit: '10mb' })); // Middleware para parsear JSON (aumentamos limite para iconos)
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
