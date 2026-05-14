@@ -117,19 +117,16 @@ router.get('/', async (req, res) => {
   `;
   
   const params = [];
+  const TZ_OFFSET = '-06:00'; // El Salvador
 
   if (date_from) {
     query += ' AND t.created_at_local >= ?';
-    params.push(new Date(date_from));
+    params.push(new Date(`${date_from}T00:00:00${TZ_OFFSET}`));
   }
 
   if (date_to) {
-    // Ajustar al final del día si es necesario, o asumir que el cliente envía timestamp completo
-    // Aquí asumimos que el cliente envía YYYY-MM-DD y queremos incluir todo ese día
-    const endDate = new Date(date_to);
-    endDate.setHours(23, 59, 59, 999);
     query += ' AND t.created_at_local <= ?';
-    params.push(endDate);
+    params.push(new Date(`${date_to}T23:59:59${TZ_OFFSET}`));
   }
 
   if (user_id) {

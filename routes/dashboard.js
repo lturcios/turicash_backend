@@ -134,6 +134,7 @@ router.get('/top-items', async (req, res) => {
   `;
 
   const params = [];
+  const TZ_OFFSET = '-06:00'; // El Salvador
 
   if (location_id) {
     query += ' AND t.location_id = ?';
@@ -142,14 +143,12 @@ router.get('/top-items', async (req, res) => {
 
   if (date_from) {
     query += ' AND t.created_at_local >= ?';
-    params.push(new Date(date_from));
+    params.push(new Date(`${date_from}T00:00:00${TZ_OFFSET}`));
   }
 
   if (date_to) {
-    const endDate = new Date(date_to);
-    endDate.setHours(23, 59, 59, 999);
     query += ' AND t.created_at_local <= ?';
-    params.push(endDate);
+    params.push(new Date(`${date_to}T23:59:59${TZ_OFFSET}`));
   }
 
   query += `
@@ -191,17 +190,16 @@ router.get('/sales-by-location', async (req, res) => {
   `;
 
   const params = [];
+  const TZ_OFFSET = '-06:00'; // El Salvador
 
   if (date_from) {
     query += ' AND t.created_at_local >= ?';
-    params.push(new Date(date_from));
+    params.push(new Date(`${date_from}T00:00:00${TZ_OFFSET}`));
   }
 
   if (date_to) {
-    const endDate = new Date(date_to);
-    endDate.setHours(23, 59, 59, 999);
     query += ' AND t.created_at_local <= ?';
-    params.push(endDate);
+    params.push(new Date(`${date_to}T23:59:59${TZ_OFFSET}`));
   }
 
   query += `
@@ -246,22 +244,21 @@ router.get('/sales-by-user', async (req, res) => {
   `;
 
   const params = [];
+  const TZ_OFFSET = '-06:00'; // El Salvador
 
   if (location_id) {
-    query += ' AND u.location_id = ?';
+    query += ' AND t.location_id = ?';
     params.push(location_id);
   }
 
   if (date_from) {
     query += ' AND t.created_at_local >= ?';
-    params.push(new Date(date_from));
+    params.push(new Date(`${date_from}T00:00:00${TZ_OFFSET}`));
   }
 
   if (date_to) {
-    const endDate = new Date(date_to);
-    endDate.setHours(23, 59, 59, 999);
     query += ' AND t.created_at_local <= ?';
-    params.push(endDate);
+    params.push(new Date(`${date_to}T23:59:59${TZ_OFFSET}`));
   }
 
   query += `
@@ -302,6 +299,7 @@ router.get('/payment-methods', async (req, res) => {
   `;
 
   const params = [];
+  const TZ_OFFSET = '-06:00'; // El Salvador
 
   if (location_id) {
     query += ' AND location_id = ?';
@@ -310,14 +308,12 @@ router.get('/payment-methods', async (req, res) => {
 
   if (date_from) {
     query += ' AND created_at_local >= ?';
-    params.push(new Date(date_from));
+    params.push(new Date(`${date_from}T00:00:00${TZ_OFFSET}`));
   }
 
   if (date_to) {
-    const endDate = new Date(date_to);
-    endDate.setHours(23, 59, 59, 999);
     query += ' AND created_at_local <= ?';
-    params.push(endDate);
+    params.push(new Date(`${date_to}T23:59:59${TZ_OFFSET}`));
   }
 
   query += `
