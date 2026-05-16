@@ -56,21 +56,17 @@ router.get('/stats', async (req, res) => {
 router.get('/sales-by-period', async (req, res) => {
   const { period = 'day', limit = 30, location_id } = req.query;
   
-  let groupByClause;
   let dateFormat;
   
   switch (period) {
     case 'week':
-      groupByClause = 'YEARWEEK(created_at_local, 1)';
       dateFormat = 'CONCAT(YEAR(created_at_local), "-W", LPAD(WEEK(created_at_local, 1), 2, "0"))';
       break;
     case 'month':
-      groupByClause = 'DATE_FORMAT(created_at_local, "%Y-%m")';
       dateFormat = 'DATE_FORMAT(created_at_local, "%Y-%m")';
       break;
     case 'day':
     default:
-      groupByClause = 'DATE(created_at_local)';
       dateFormat = 'DATE(created_at_local)';
       break;
   }
@@ -93,7 +89,7 @@ router.get('/sales-by-period', async (req, res) => {
   }
 
   query += `
-    GROUP BY ${groupByClause}
+    GROUP BY period
     ORDER BY period DESC
     LIMIT ?
   `;

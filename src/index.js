@@ -41,7 +41,11 @@ testConnection();
 const allowedOrigins = [
        'https://interno.metrocuadrado.com.sv',  
        'http://localhost:5173',
-       'http://localhost:3000'
+       'http://localhost:3000',
+       'http://localhost',
+       'capacitor://localhost',
+       'https://localhost',
+       'http://localhost:8100'
     ];
 
 // --- Middlewares ---
@@ -53,6 +57,7 @@ app.use(cors({
       if (allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
+        console.error('Origen rechazado por CORS:', origin);
         callback(new Error('No permitido por CORS'));
       }
     },
