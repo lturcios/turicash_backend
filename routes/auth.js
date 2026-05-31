@@ -81,7 +81,7 @@ router.post('/login', async (req, res) => {
     };
 
     const token = jwt.sign(payload, JWT_SECRET, {
-      expiresIn: '1d', // Token expira en 1 día
+      expiresIn: '5m', // Token expira en 5 minutos para pruebas
     });
 
     // Login exitoso
